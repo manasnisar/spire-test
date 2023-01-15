@@ -40,7 +40,7 @@ async function verifyAddress(form) {
                 zip: xmlDoc.getElementsByTagName("State")[0]?.innerHTML,
             }
 
-            updateDOM(typedAddress, standardAddress);
+            updateDOMAndSaveAddress(typedAddress, standardAddress);
         }
     }
     //prints out error if validation request fails
@@ -52,7 +52,9 @@ async function verifyAddress(form) {
     xhttp.send();
 }
 
+//display failure message in same modal if address validation fails or address is incorrect
 function handleFailure(msg) {
+    //Add failure message content to DOM
     const modalHeading = document.getElementById('modal-heading');
     const modalBody = document.getElementById('modal-body');
 
@@ -62,10 +64,14 @@ function handleFailure(msg) {
     modalBody.innerHTML = msg;
     modalHeading.innerHTML = 'Failure';
 
-    showModal();
+    //shows modal
+    toggleModal();
 }
 
-function updateDOM(typedAddress, standardAddress) {
+//updates DOM, displays the modal and saves the address to local storage
+function updateDOMAndSaveAddress(typedAddress, standardAddress) {
+
+    //updates DOM
     document.getElementById('typed-address1').innerText = typedAddress.address1 || '';
     document.getElementById('typed-address2').innerText = typedAddress.address2 || '';
     document.getElementById('typed-city').innerText = typedAddress.city || '';
@@ -76,15 +82,31 @@ function updateDOM(typedAddress, standardAddress) {
     document.getElementById('standard-city').innerText = standardAddress.city || '';
     document.getElementById('standard-state-zip').innerText = `${standardAddress.state} ${standardAddress.zip}`
 
-    showModal();
+
+    //add listeners to save to local storage after selecing address
+    const typedAddressSaveButton = document.getElementById('typed-address-save-button');
+    const standardAddressSaveButton = document.getElementById('standard-address-save-button');
+
+    typedAddressSaveButton.addEventListener('click', () => {
+        localStorage.setItem('selected-address', typedAddress);
+        toggleModal();
+    })
+
+    standardAddressSaveButton.addEventListener('click', () => {
+        localStorage.setItem('selected-address', standardAddress);
+        toggleModal();
+    })
+
+    //show modal
+    toggleModal();
 }
 
-
-function showModal() {
-    //show modal for address for selecting address
-    let verificationModal = new bootstrap.Modal(
-        document.getElementById("address-verification-modal"),
-        {}
-    );
+//Shows/hides modal
+function toggleModal() {
+    const  verificationModal = bootstrap.Modal.getOrCreateInstance(document.getElementById("address-verification-modal")) 
+    if (verificationModal._isShown) {
+        verificationModal.hide();
+        return;
+    }
     verificationModal.show();
 }
