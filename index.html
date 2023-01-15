@@ -195,13 +195,13 @@
                         </Address>
                     </AddressValidateRequest>
                     `
-                    const url = 'http://production.shippingapis.com/ShippingAPI.dll?API=Verify&xml=' + xml;
+                    const url = 'https://secure.shippingapis.com/ShippingAPI.dll?API=Verify&xml=' + xml;
                     xhttp.open('GET', url, true);
 
                     xhttp.onreadystatechange = (e) => {
                         if (xhttp.readyState == 4 && xhttp.status == 200) {
                             console.log('request successful');
-                            console.log(xhttp.response);
+                            console.log(xhttp.responseXML);
                         }
                     }
 
