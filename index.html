@@ -7,7 +7,9 @@
     <title>Spire Test</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-    <script type="text/javascript" src="./script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
 </head>
 
 <body class="bg-light">
@@ -63,6 +65,12 @@
                                     2 <span class="text-muted">(Optional)</span></label>
                                 <input type="text" class="form-control" id="address2" name="address2"
                                     placeholder="Apartment or suite" />
+                            </div>
+
+                            <div class="col-12">
+                                <label for="city" class="form-label">City<span class="text-muted"></span>
+                                        (Optional)</span></label>
+                                <input type="text" class="form-control" id="city" name="city" placeholder="City" />
                             </div>
 
                             <div class="col-md-5">
@@ -159,6 +167,44 @@
                     </form>
                 </div>
             </div>
+            <div id="address-verification-modal" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 id="modal-heading" class="modal-title">Select address</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div id="modal-body" class="modal-body justify-content-between row">
+                            <div class="col">
+                                <h6 class="mb-3">Typed address</h3>
+                                    <div class="d-flex flex-column">
+                                        <span id="typed-address1"></span>
+                                        <span id="typed-address2"></span>
+                                        <span id="typed-city"></span>
+                                        <span id="typed-state-zip"></span>
+                                        <span>United States</span>
+                                    </div>
+                                    <div id="action-button" class="mt-4">
+                                        <button class="w-100 btn btn-primary btn-sm" type="button">Select</button>
+                                    </div>
+                            </div>
+                            <div class="col">
+                                <h6 class="mb-3">Standard address</h3>
+                                    <div class="d-flex flex-column">
+                                        <span id="standard-address1"></span>
+                                        <span id="standard-address2"></span>
+                                        <span id="standard-city"></span>
+                                        <span id="standard-state-zip"></span>
+                                        <span>United States</span>
+                                    </div>
+                                    <div id="action-button" class="mt-4">
+                                        <button class="w-100 btn btn-primary btn-sm" type="button">Select</button>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
 
         <footer class="my-5 pt-5 text-muted text-center text-small">
@@ -169,54 +215,32 @@
                 <li class="list-inline-item"><a href="#">Support</a></li>
             </ul>
         </footer>
-
     </div>
     <script>
+        //runs on script load
         (() => {
             'use strict'
-            // Fetch all the forms we want to apply custom Bootstrap validation styles to
-            const form = document.querySelector('.needs-validation')
+            // Fetch the form using class selector we want to apply custom bootstrap validation styles to
+            const form = document.querySelector('.needs-validation');
+
             form.addEventListener('submit', event => {
+                //avoid default event event behavior, stops page reloads on form submit in our case
                 event.preventDefault()
+
+
+                // check form validity
                 if (!form.checkValidity()) {
+                    //abort event propagation if form fields are not valid
                     event.stopPropagation()
                 } else {
-                    const formData = Object.fromEntries(new FormData(form))
-                    const xhttp = new XMLHttpRequest();
-                    let xml = `
-                    <AddressValidateRequest USERID="724TEST04353">
-                        <Revision>1</Revision>
-                        <Address>
-                            <Address1>${formData.address1}</Address1>
-                            <Address2>${formData.address2}</Address2>
-                            <City>${formData.city}</City>
-                            <State>${formData.state}</State>
-                            <Zip5>${formData.zip}</Zip5>
-                        </Address>
-                    </AddressValidateRequest>
-                    `
-                    const url = 'https://secure.shippingapis.com/ShippingAPI.dll?API=Verify&xml=' + xml;
-                    xhttp.open('GET', url, true);
-
-                    xhttp.onreadystatechange = (e) => {
-                        if (xhttp.readyState == 4 && xhttp.status == 200) {
-                            console.log('request successful');
-                            console.log(xhttp.responseXML);
-                        }
-                    }
-
-                    xhttp.onerror = (e) => {
-                        console.log(e)
-                        console.log(xhttp.response);
-                    }
-
-                    xhttp.send();
+                    verifyAddress(form)
                 }
+                //add class to form to trigger ui changes after form validation
                 form.classList.add('was-validated')
             }, false)
-
         })()
     </script>
+    <script type="application/javascript" src="./script.js"></script>
 </body>
 
 </html>
