@@ -36,8 +36,8 @@ async function verifyAddress(form) {
                 address1: xmlDoc.getElementsByTagName("Address1")[0]?.innerHTML,
                 address2: xmlDoc.getElementsByTagName("Address2")[0]?.innerHTML,
                 city: xmlDoc.getElementsByTagName("City")[0]?.innerHTML,
-                state: `${xmlDoc.getElementsByTagName("Zip5")[0]?.innerHTML}-${xmlDoc.getElementsByTagName("Zip4")[0]?.innerHTML}`,
-                zip: xmlDoc.getElementsByTagName("State")[0]?.innerHTML,
+                state:  xmlDoc.getElementsByTagName("State")[0]?.innerHTML,
+                zip: `${xmlDoc.getElementsByTagName("Zip5")[0]?.innerHTML}-${xmlDoc.getElementsByTagName("Zip4")[0]?.innerHTML}`,
             }
 
             updateDOMAndSaveAddress(typedAddress, standardAddress);
@@ -72,29 +72,36 @@ function handleFailure(msg) {
 function updateDOMAndSaveAddress(typedAddress, standardAddress) {
 
     //updates DOM
-    document.getElementById('typed-address1').innerText = typedAddress.address1 || '';
-    document.getElementById('typed-address2').innerText = typedAddress.address2 || '';
-    document.getElementById('typed-city').innerText = typedAddress.city || '';
-    document.getElementById('typed-state-zip').innerText = `${typedAddress.state} ${typedAddress.zip}`
+    const selectedAddress1 = document.getElementById('selected-address1');
+    const selectedAddress2 = document.getElementById('selected-address2');
+    const selectedCity = document.getElementById('selected-city');
+    const selectedState = document.getElementById('selected-state');
+    const selectedZip = document.getElementById('selected-zip');
 
-    document.getElementById('standard-address1').innerText = standardAddress.address1 || '';
-    document.getElementById('standard-address2').innerText = standardAddress.address2 || '';
-    document.getElementById('standard-city').innerText = standardAddress.city || '';
-    document.getElementById('standard-state-zip').innerText = `${standardAddress.state} ${standardAddress.zip}`
-
+    selectedAddress1.innerText = typedAddress.address1 || '';
+    selectedAddress2.innerText = typedAddress.address2 || '';
+    selectedCity.innerText = typedAddress.city || '';
+    selectedState.innerText = typedAddress.state || '';
+    selectedZip.innerText = typedAddress.zip || '';
 
     //add listeners to save to local storage after selecing address
-    const typedAddressSaveButton = document.getElementById('typed-address-save-button');
-    const standardAddressSaveButton = document.getElementById('standard-address-save-button');
+    const typedAddressSelectButton = document.getElementById('origaddradio');
+    const standardAddressSelectButton = document.getElementById('stanaddradio');
 
-    typedAddressSaveButton.addEventListener('click', () => {
-        localStorage.setItem('selected-address', typedAddress);
-        toggleModal();
+    typedAddressSelectButton.addEventListener('click', () => {
+        selectedAddress1.innerText = typedAddress.address1 || '';
+        selectedAddress2.innerText = typedAddress.address2 || '';
+        selectedCity.innerText = typedAddress.city || '';
+        selectedState.innerText = typedAddress.state || '';
+        selectedZip.innerText = typedAddress.zip || '';
     })
 
-    standardAddressSaveButton.addEventListener('click', () => {
-        localStorage.setItem('selected-address', standardAddress);
-        toggleModal();
+    standardAddressSelectButton.addEventListener('click', () => {
+        selectedAddress1.innerText = standardAddress.address1 || '';
+        selectedAddress2.innerText = standardAddress.address2 || '';
+        selectedCity.innerText = standardAddress.city || '';
+        selectedState.innerText = standardAddress.state || '';
+        selectedZip.innerText = standardAddress.zip || '';
     })
 
     //show modal
