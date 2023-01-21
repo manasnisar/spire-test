@@ -71,6 +71,8 @@ function handleFailure(msg) {
 //updates DOM, displays the modal and saves the address to local storage
 function updateDOMAndSaveAddress(typedAddress, standardAddress) {
 
+    let selectedAddress = typedAddress;
+
     //updates DOM
     const selectedAddress1 = document.getElementById('selected-address1');
     const selectedAddress2 = document.getElementById('selected-address2');
@@ -87,6 +89,7 @@ function updateDOMAndSaveAddress(typedAddress, standardAddress) {
     //add listeners to save to local storage after selecing address
     const typedAddressSelectButton = document.getElementById('origaddradio');
     const standardAddressSelectButton = document.getElementById('stanaddradio');
+    const saveToDbButton = document.getElementById('standard-address-save-button')
 
     typedAddressSelectButton.addEventListener('click', () => {
         selectedAddress1.innerText = typedAddress.address1 || '';
@@ -94,6 +97,7 @@ function updateDOMAndSaveAddress(typedAddress, standardAddress) {
         selectedCity.innerText = typedAddress.city || '';
         selectedState.innerText = typedAddress.state || '';
         selectedZip.innerText = typedAddress.zip || '';
+        selectedAddress = typedAddress;
     })
 
     standardAddressSelectButton.addEventListener('click', () => {
@@ -102,6 +106,11 @@ function updateDOMAndSaveAddress(typedAddress, standardAddress) {
         selectedCity.innerText = standardAddress.city || '';
         selectedState.innerText = standardAddress.state || '';
         selectedZip.innerText = standardAddress.zip || '';
+        selectedAddress = standardAddress;
+    })
+
+    saveToDbButton.addEventListener('click', () => {
+        if(selectedAddress) saveToDB(selectedAddress);
     })
 
     //show modal
@@ -116,4 +125,33 @@ function toggleModal() {
         return;
     }
     verificationModal.show();
+}
+
+async function saveToDB(address) {
+    const xhttp = new XMLHttpRequest();
+
+    //set address validation API URL
+    const url = `server.php?${new URLSearchParams(address).toString()}`;
+
+    //initiate request
+    xhttp.open('GET', url, true);
+
+    // runs on every state change
+    xhttp.onreadystatechange = (e) => {
+        //if request is successfull
+        if (xhttp.readyState == 4 && xhttp.status == 200) {
+            const alert = document.getElementById('alertWrapper');
+            alert.classList.remove('d-none');
+            setTimeout(() => {
+                alert.classList.add('d-none');
+            }, 3000)
+        }
+    }
+    //prints out error if validation request fails
+    xhttp.onerror = (e) => {
+        handleFailure('Failed to save address to DB');
+    }
+
+    //send XHR
+    xhttp.send();
 }
